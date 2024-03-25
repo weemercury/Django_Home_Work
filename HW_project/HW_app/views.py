@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 import logging
 from HW_app.models import Client, Product, Order
 from datetime import datetime, timedelta
 from django.utils import timezone
+from .forms import ProductForm
 
 
 logger = logging.getLogger(__name__)
@@ -34,3 +35,15 @@ def get_order(request, client_id):
     orders = resent_orders.order_by('add_date')
 
     return render(request, 'HW_app/order.html', {'orders': orders, 'time':days})
+
+
+# HW_4 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+def product_form(request, product_pk):
+    if request.method == 'POST':
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            form.save()
+    else:
+        product = get_object_or_404(Product, pk=product_pk)
+        form = ProductForm(instance=product)
+    return render(request, 'HW_app/product_form.html', {'form': form})
